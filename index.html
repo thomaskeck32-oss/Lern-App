@@ -1,0 +1,26 @@
+<!doctype html><html lang="de"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kälte-Meister Theorie Pro</title>
+<link rel="stylesheet" href="style.css"><link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#071525"><link rel="apple-touch-icon" href="icon-192.png">
+</head><body><main id="app">
+<section id="menu" class="card">
+<h1>❄️ Kälte-Meister Theorie Pro</h1>
+<p>Direkt lernen für die Theorie-Zwischenprüfung.</p>
+<select id="topicSelect"></select>
+<div class="grid">
+<button onclick="start('learn')">📚 Lernen</button>
+<button onclick="start('exam')">📝 Prüfung</button>
+<button onclick="start('weak')">🎯 Schwächen</button>
+<button onclick="showStats()">📊 Statistik</button>
+</div><p id="statsLine"></p>
+</section>
+<section id="quiz" class="card hidden">
+<div class="top"><span id="mode"></span><button onclick="goMenu()">Menü</button></div>
+<div class="progress"><div id="bar"></div></div><div id="topic"></div><h2 id="question"></h2>
+<div id="answers"></div><div id="explain"></div><button id="next" class="hidden" onclick="nextQuestion()">Weiter</button>
+</section>
+<section id="result" class="card hidden"><h2 id="resultTitle">Ergebnis</h2><div id="resultText"></div><button onclick="goMenu()">Menü</button></section>
+</main><script src="questions.js"></script><script src="script.js"></script>
+<script>if('serviceWorker'in navigator){navigator.serviceWorker.register('service-worker.js').catch(()=>{});}</script>
+</body></html>

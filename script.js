@@ -1,0 +1,17 @@
+let state={mode:"learn",deck:[],i:0,ok:0,total:0,topic:"Alle",mistakes:[]};
+let stats=JSON.parse(localStorage.getItem("km_pro_stats")||'{"ok":0,"all":0,"byTopic":{},"wrong":[]}');
+function init(){const topics=["Alle",...new Set(QUESTIONS.map(q=>q.topic))].sort();topicSelect.innerHTML=topics.map(t=>`<option>${t}</option>`).join("");updateStatsLine();}
+function updateStatsLine(){let p=stats.all?Math.round(stats.ok/stats.all*100):0;statsLine.textContent=`Fragen: ${QUESTIONS.length} · Gesamt: ${stats.ok}/${stats.all} richtig (${p}%)`;}
+function save(){localStorage.setItem("km_pro_stats",JSON.stringify(stats));}
+function start(modeName){state.mode=modeName;state.topic=topicSelect.value;state.i=0;state.ok=0;state.total=0;let pool;
+ if(modeName==="weak"){pool=stats.wrong.map(i=>QUESTIONS[i]).filter(Boolean); if(!pool.length) pool=QUESTIONS.filter(q=>q.difficulty>=4);}
+ else pool=state.topic==="Alle"?QUESTIONS:QUESTIONS.filter(q=>q.topic===state.topic);
+ state.deck=[...pool].sort(()=>Math.random()-.5); if(modeName==="exam") state.deck=state.deck.slice(0,Math.min(30,state.deck.length));
+ menu.classList.add("hidden");result.classList.add("hidden");quiz.classList.remove("hidden");draw();}
+function draw(){if(state.i>=state.deck.length){finish();return;}const q=state.deck[state.i];mode.textContent=(state.mode==="exam"?"Prüfung":state.mode==="weak"?"Schwächen":"Lernen")+` · ${state.i+1}/${state.deck.length}`;bar.style.width=Math.round(state.i/state.deck.length*100)+"%";topic.textContent=q.topic+" · Stufe "+q.difficulty;question.textContent=q.q;answers.innerHTML="";explain.textContent="";next.classList.add("hidden");q.a.forEach((a,idx)=>{let b=document.createElement("button");b.className="answer";b.textContent=String.fromCharCode(65+idx)+") "+a;b.onclick=()=>answer(idx,b);answers.appendChild(b);});}
+function answer(idx,btn){const q=state.deck[state.i];[...answers.children].forEach(b=>b.disabled=true);answers.children[q.c].classList.add("correct");state.total++;stats.all++;if(!stats.byTopic[q.topic])stats.byTopic[q.topic]={ok:0,all:0};stats.byTopic[q.topic].all++;let qi=QUESTIONS.indexOf(q);if(idx===q.c){btn.classList.add("correct");state.ok++;stats.ok++;stats.byTopic[q.topic].ok++;stats.wrong=stats.wrong.filter(x=>x!==qi);explain.textContent="✅ Richtig! "+q.e;}else{btn.classList.add("wrong");if(qi>=0&&!stats.wrong.includes(qi))stats.wrong.push(qi);explain.textContent="❌ Falsch. Richtig: "+q.a[q.c]+". "+q.e;}save();next.classList.remove("hidden");}
+function nextQuestion(){state.i++;draw();}
+function finish(){quiz.classList.add("hidden");result.classList.remove("hidden");let p=state.total?Math.round(state.ok/state.total*100):0;resultText.innerHTML=`<p><b>${state.ok}/${state.total}</b> richtig (${p}%).</p>`+(state.mode==="exam"?(p>=50?"<p>✅ Bestanden.</p>":"<p>❌ Noch üben.</p>"):"");updateStatsLine();}
+function showStats(){menu.classList.add("hidden");result.classList.remove("hidden");resultTitle.textContent="Statistik";let html=`<p>Gesamt: ${stats.ok}/${stats.all} (${stats.all?Math.round(stats.ok/stats.all*100):0}%)</p><p>Falsch gemerkt: ${stats.wrong.length}</p><hr>`;Object.entries(stats.byTopic).forEach(([t,v])=>html+=`<p>${t}: ${v.ok}/${v.all} (${Math.round(v.ok/v.all*100)}%)</p>`);resultText.innerHTML=html;}
+function goMenu(){quiz.classList.add("hidden");result.classList.add("hidden");menu.classList.remove("hidden");resultTitle.textContent="Ergebnis";updateStatsLine();}
+init();

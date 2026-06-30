@@ -1,0 +1,5 @@
+Pro-Version
+- 78 hochwertige Theoriefragen
+- Lernmodus, Prüfung, Schwächenmodus
+- Themenstatistik
+- PWA für iPhone
